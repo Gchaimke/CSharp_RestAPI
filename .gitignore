@@ -2,3 +2,4 @@ Catalog.Api/appsettings.json
 Catalog.Api/bin
 Catalog.UnitTests/bin
 */obj/Debug
+Catalog.Api/obj/staticwebassets.pack.sentinel
