@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "1DCkS8CdrLAOxqrcisXexolzdhA9f+hBcjOaegjLclbx49J6l+yHcATKczfPhEe6qTBSKAGeVz/UcwpWg/dzIQ==",
+  "success": true,
+  "projectFilePath": "G:\\_Archive\\Chaim\\RestAPI\\build.proj",
+  "expectedPackageFiles": [
+    "C:\\Users\\gchaim\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.2\\microsoft.netframework.referenceassemblies.1.0.2.nupkg.sha512",
+    "C:\\Users\\gchaim\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net45\\1.0.2\\microsoft.netframework.referenceassemblies.net45.1.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}

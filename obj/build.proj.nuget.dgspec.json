@@ -1,0 +1,53 @@
+{
+  "format": 1,
+  "restore": {
+    "G:\\_Archive\\Chaim\\RestAPI\\build.proj": {}
+  },
+  "projects": {
+    "G:\\_Archive\\Chaim\\RestAPI\\build.proj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\_Archive\\Chaim\\RestAPI\\build.proj",
+        "projectName": "build",
+        "projectPath": "G:\\_Archive\\Chaim\\RestAPI\\build.proj",
+        "packagesPath": "C:\\Users\\gchaim\\.nuget\\packages\\",
+        "outputPath": "G:\\_Archive\\Chaim\\RestAPI\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\gchaim\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net45"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net45": {
+            "targetAlias": "net45",
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net45": {
+          "targetAlias": "net45",
+          "dependencies": {
+            "Microsoft.NETFramework.ReferenceAssemblies": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.2, )",
+              "autoReferenced": true
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
