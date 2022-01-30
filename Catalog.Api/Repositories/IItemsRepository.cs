@@ -5,11 +5,11 @@ namespace Catalog.Api.Repositories
     public interface IItemsRepository
     {
         
-        Task<Item> GetItemAsync(Guid id);
+        Task<Item> GetItemAsync(int id);
         Task<IEnumerable<Item>> GetItemsAsync();
         Task CreateItemAsync(Item item);
         Task UpdateItemASync(Item item);
-        Task DeleteItemAsync(Guid id);
+        Task DeleteItemAsync(int id);
     }
     
 }

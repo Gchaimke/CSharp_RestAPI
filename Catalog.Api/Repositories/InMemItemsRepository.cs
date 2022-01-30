@@ -6,9 +6,9 @@ namespace Catalog.Api.Repositories
     {
         private readonly List<Item> items = new()
         {
-            new Item { Id = Guid.NewGuid(), Name = "Poition", Price = 9, CreatedDate = DateTimeOffset.UtcNow },
-            new Item { Id = Guid.NewGuid(), Name = "Iron Sword", Price = 20, CreatedDate = DateTimeOffset.UtcNow },
-            new Item { Id = Guid.NewGuid(), Name = "Bronze Shield", Price = 18, CreatedDate = DateTimeOffset.UtcNow }
+            new Item { Id = 1, Name = "Poition", DisplayOrder = 1, CreateDateTime = DateTime.UtcNow },
+            new Item { Id = 2, Name = "Iron Sword", DisplayOrder = 2, CreateDateTime = DateTime.UtcNow },
+            new Item { Id = 3, Name = "Bronze Shield", DisplayOrder = 3, CreateDateTime = DateTime.UtcNow }
         };
 
         public async Task<IEnumerable<Item>> GetItemsAsync()
@@ -16,9 +16,9 @@ namespace Catalog.Api.Repositories
             return await Task.FromResult(items);
         }
 
-        public async Task<Item> GetItemAsync(Guid id)
+        public async Task<Item> GetItemAsync(int id)
         {
-            var item =  items.Where(item => item.Id == id).SingleOrDefault();
+            var item =  items.SingleOrDefault(item => item.Id == id);
             return await Task.FromResult(item);
         }
  
@@ -35,7 +35,7 @@ namespace Catalog.Api.Repositories
             await Task.CompletedTask;
         }
  
-        public async Task DeleteItemAsync(Guid id)
+        public async Task DeleteItemAsync(int id)
         {
             var index = items.FindIndex(existingItem => existingItem.Id == id);
             items.RemoveAt(index);
