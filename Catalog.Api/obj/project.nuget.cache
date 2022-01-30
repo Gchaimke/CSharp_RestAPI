@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "BBYgPwd6+jiuhhECdUOf6oVTMn7tifXgepC98TICwep0BSImF1ipKrsgsrykhICvbYB9mwt7FswxMuTsUAXaQg==",
+  "dgSpecHash": "1MomrloHFoScw5Hc3kQS3s64BcBhiyULWQ6X2OPuFrXsDwLmHbYSLVkVCxRWkD8k7aJg7KPLNRs0SYaywGK8Eg==",
   "success": true,
-  "projectFilePath": "G:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj",
+  "projectFilePath": "g:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\gchaim\\.nuget\\packages\\aspnetcore.healthchecks.mongodb\\6.0.1\\aspnetcore.healthchecks.mongodb.6.0.1.nupkg.sha512",
     "C:\\Users\\gchaim\\.nuget\\packages\\dnsclient\\1.4.0\\dnsclient.1.4.0.nupkg.sha512",

@@ -7522,11 +7522,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "G:\\_Archive\\Chaim\\RestAPI\\Catalog.UnitTests\\Catalog.UnitTests.csproj",
+      "projectUniqueName": "g:\\_Archive\\Chaim\\RestAPI\\Catalog.UnitTests\\Catalog.UnitTests.csproj",
       "projectName": "Catalog.UnitTests",
-      "projectPath": "G:\\_Archive\\Chaim\\RestAPI\\Catalog.UnitTests\\Catalog.UnitTests.csproj",
+      "projectPath": "g:\\_Archive\\Chaim\\RestAPI\\Catalog.UnitTests\\Catalog.UnitTests.csproj",
       "packagesPath": "C:\\Users\\gchaim\\.nuget\\packages\\",
-      "outputPath": "G:\\_Archive\\Chaim\\RestAPI\\Catalog.UnitTests\\obj\\",
+      "outputPath": "g:\\_Archive\\Chaim\\RestAPI\\Catalog.UnitTests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -7546,8 +7546,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "G:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj": {
-              "projectPath": "G:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj"
+            "g:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj": {
+              "projectPath": "g:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj"
             }
           }
         }

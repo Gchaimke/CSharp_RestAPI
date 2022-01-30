@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "G:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj": {}
+    "g:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj": {}
   },
   "projects": {
-    "G:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj": {
+    "g:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj",
+        "projectUniqueName": "g:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj",
         "projectName": "Catalog.Api",
-        "projectPath": "G:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj",
+        "projectPath": "g:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\Catalog.Api.csproj",
         "packagesPath": "C:\\Users\\gchaim\\.nuget\\packages\\",
-        "outputPath": "G:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\obj\\",
+        "outputPath": "g:\\_Archive\\Chaim\\RestAPI\\Catalog.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
