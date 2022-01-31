@@ -1,0 +1,4 @@
+# create service
+sc.exe create PriorityAPI binpath= "C:\Intel\Priority\Catalog.Api.exe" displayname= PriorityApi start= auto
+# delete service
+sc.exe delete PriorityAPI
