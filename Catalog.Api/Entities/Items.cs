@@ -11,7 +11,7 @@ namespace Catalog.Api.Entities
 
         [Display(Name = "Display Order")]
         [Range(1, 1000, ErrorMessage = "Range between 1 and 1000")]
-        public int DisplayOrder { get; set; } = 1;
+        public int DisplayOrder { get; set; }
         public DateTime CreateDateTime { get; set; } = DateTime.UtcNow;
 
     }

@@ -9,26 +9,26 @@ namespace Catalog.Api.Controllers
     [Route("items")]
     public class ItemsController : ControllerBase
     {
-        private readonly SqlDbRepository repository;
+        private readonly SqlDbRepository db;
         private readonly ILogger<ItemsController> logger;
-        public ItemsController(SqlDbRepository repository, ILogger<ItemsController> logger)
+        public ItemsController(SqlDbRepository db, ILogger<ItemsController> logger)
         {
-            this.repository = repository;
+            this.db = db;
             this.logger = logger;
         }
 
         [HttpGet]
         public IEnumerable<Item> GetItems()
         {
-            IEnumerable<Item> items = repository.Items;
-            // logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {items.Count()} items");
+            IEnumerable<Item> items = db.Items;
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {items.Count()} items");
             return items;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ItemDto>> GetItemAsync(int id)
         {
-            var item = await repository.Items.FindAsync(id);
+            var item = await db.Items.FindAsync(id);
             if (item is null)
             {
                 return NotFound();
@@ -44,14 +44,15 @@ namespace Catalog.Api.Controllers
                 Name = itemDto.Name,
                 DisplayOrder = itemDto.DisplayOrder,
             };
-            await repository.Items.AddAsync(item);
+            await db.Items.AddAsync(item);
+            await db.SaveChangesAsync();
             return CreatedAtAction(nameof(GetItemAsync), new { id = item.Id }, item.AsDto());
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateItemAsync(int id, UpdateItemDto itemDto)
         {
-            var existingItem = await repository.Items.FindAsync(id);
+            var existingItem = await db.Items.FindAsync(id);
             if (existingItem is null)
             {
                 return NotFound();
@@ -60,20 +61,22 @@ namespace Catalog.Api.Controllers
             existingItem.Name = itemDto.Name;
             existingItem.DisplayOrder = itemDto.DisplayOrder;
 
-            repository.Items.Update(existingItem);
-            return NoContent();
+            db.Items.Update(existingItem);
+            await db.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetItemAsync), new { id = existingItem.Id }, existingItem.AsDto());
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteItemAsync(int id)
         {
-            var existingItem = await repository.Items.FindAsync(id);
+            var existingItem = await db.Items.FindAsync(id);
             if (existingItem is null)
             {
                 return NotFound();
             }
-            repository.Items.Remove(existingItem);
-            return NoContent();
+            db.Items.Remove(existingItem);
+            await db.SaveChangesAsync();
+            return Ok("Deleted");
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Catalog.Api
                 Id = item.Id,
                 Name = item.Name,
                 DisplayOrder = item.DisplayOrder,
-                CreateDateTime = item.CreateDateTime
+                CreateDate = item.CreateDateTime
             };
         }
     }
