@@ -10,5 +10,6 @@ public class SqlDbRepository : DbContext
     public SqlDbRepository(DbContextOptions<SqlDbRepository> options) : base(options) {}
 
     public DbSet<Item> Items { get; set; }
+    public DbSet<Order> ORDERS { get; set; }
 
 }

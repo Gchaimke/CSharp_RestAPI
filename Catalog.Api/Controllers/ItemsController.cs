@@ -46,7 +46,7 @@ namespace Catalog.Api.Controllers
                 return NotFound();
             }
             logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {item}");
-            return item.AsDto();
+            return item.AsItemDto();
         }
 
         [HttpPost]
@@ -60,7 +60,7 @@ namespace Catalog.Api.Controllers
             await db.Items.AddAsync(item);
             await db.SaveChangesAsync();
             logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Cerated {item}");
-            return CreatedAtAction(nameof(GetItemAsync), new { id = item.Id }, item.AsDto());
+            return CreatedAtAction(nameof(GetItemAsync), new { id = item.Id }, item.AsItemDto());
         }
 
         [HttpPut("{id}")]
@@ -78,7 +78,7 @@ namespace Catalog.Api.Controllers
             db.Items.Update(item);
             await db.SaveChangesAsync();
             logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Updated {item}");
-            return CreatedAtAction(nameof(GetItemAsync), new { id = item.Id }, item.AsDto());
+            return CreatedAtAction(nameof(GetItemAsync), new { id = item.Id }, item.AsItemDto());
         }
 
         [HttpDelete("{id}")]
@@ -91,7 +91,7 @@ namespace Catalog.Api.Controllers
             }
             db.Items.Remove(item);
             await db.SaveChangesAsync();
-            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Updated {item}");
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Deleted {item}");
             return Ok("Deleted");
         }
     }

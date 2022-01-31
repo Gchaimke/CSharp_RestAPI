@@ -5,7 +5,7 @@ namespace Catalog.Api
 {
     public static class Extensions
     {
-        public static ItemDto AsDto(this Item item)
+        public static ItemDto AsItemDto(this Item item)
         {
             return new ItemDto(item.Id, item.Name, item.DisplayOrder, item.CreateDateTime)
             {
@@ -13,6 +13,16 @@ namespace Catalog.Api
                 Name = item.Name,
                 DisplayOrder = item.DisplayOrder,
                 CreateDate = item.CreateDateTime
+            };
+        }
+
+        public static OrderDto AsOrderDto(this Order order)
+        {
+            return new OrderDto(order.ORD,order.CUST, order.ORDNAME)
+            {
+                ORD = order.ORD,
+                ORDNAME = order.ORDNAME,
+                CUST = order.CUST
             };
         }
     }

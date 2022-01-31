@@ -5,7 +5,6 @@ using Catalog.Api.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
-// builder.Services.AddSingleton<IItemsRepository, InMemItemsRepository>();   
 builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
 builder.Services.AddDbContext<SqlDbRepository>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
