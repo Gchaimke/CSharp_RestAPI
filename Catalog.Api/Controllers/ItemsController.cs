@@ -25,7 +25,19 @@ namespace Catalog.Api.Controllers
             return items;
         }
 
-        [HttpGet("{id}")]
+        [Route("filter")]
+        public IEnumerable<Item> GetItems(string? name = "", int? order = 0)
+        {
+            IQueryable<Item> items = db.Items;
+            if (!string.IsNullOrWhiteSpace(name))
+                items = items.Where(i => i.Name.Contains(name));
+            if (order > 0)
+                items = items.Where(i => i.DisplayOrder >= order);
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {items.Count()} items");
+            return items;
+        }
+
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<ItemDto>> GetItemAsync(int id)
         {
             var item = await db.Items.FindAsync(id);
@@ -33,6 +45,7 @@ namespace Catalog.Api.Controllers
             {
                 return NotFound();
             }
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {item}");
             return item.AsDto();
         }
 
@@ -46,36 +59,39 @@ namespace Catalog.Api.Controllers
             };
             await db.Items.AddAsync(item);
             await db.SaveChangesAsync();
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Cerated {item}");
             return CreatedAtAction(nameof(GetItemAsync), new { id = item.Id }, item.AsDto());
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateItemAsync(int id, UpdateItemDto itemDto)
         {
-            var existingItem = await db.Items.FindAsync(id);
-            if (existingItem is null)
+            var item = await db.Items.FindAsync(id);
+            if (item is null)
             {
                 return NotFound();
             }
 
-            existingItem.Name = itemDto.Name;
-            existingItem.DisplayOrder = itemDto.DisplayOrder;
+            item.Name = itemDto.Name;
+            item.DisplayOrder = itemDto.DisplayOrder;
 
-            db.Items.Update(existingItem);
+            db.Items.Update(item);
             await db.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetItemAsync), new { id = existingItem.Id }, existingItem.AsDto());
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Updated {item}");
+            return CreatedAtAction(nameof(GetItemAsync), new { id = item.Id }, item.AsDto());
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteItemAsync(int id)
         {
-            var existingItem = await db.Items.FindAsync(id);
-            if (existingItem is null)
+            var item = await db.Items.FindAsync(id);
+            if (item is null)
             {
                 return NotFound();
             }
-            db.Items.Remove(existingItem);
+            db.Items.Remove(item);
             await db.SaveChangesAsync();
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Updated {item}");
             return Ok("Deleted");
         }
     }
