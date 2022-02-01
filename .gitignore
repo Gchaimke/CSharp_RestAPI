@@ -2,7 +2,7 @@ Avdor.Api/appsettings.json
 Avdor.Api/bin
 Avdor.Api/logs
 Avdor.Api/obj
-Catalog.UnitTests/bin
+Avdor.UnitTests/bin
 publish
 */obj/Debug
 */obj/Release
