@@ -1,9 +1,8 @@
-Catalog.Api/appsettings.json
-Catalog.Api/bin
-Catalog.Api/logs
-Catalog.Api/obj
+Avdor.Api/appsettings.json
+Avdor.Api/bin
+Avdor.Api/logs
+Avdor.Api/obj
 Catalog.UnitTests/bin
 publish
 */obj/Debug
 */obj/Release
-Catalog.Api/obj/staticwebassets.pack.sentinel

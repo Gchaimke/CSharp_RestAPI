@@ -1,7 +1,7 @@
-using SecuringWebApiUsingApiKey.Middleware;
 using Microsoft.EntityFrameworkCore;
-using Catalog.Api.Repositories;
 using Microsoft.AspNetCore.HttpLogging;
+using Avdor.Api.Repositories;
+using Avdor.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Catalog.Api": {
+    "Avdor.Api": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
