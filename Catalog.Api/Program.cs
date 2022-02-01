@@ -1,17 +1,21 @@
 using SecuringWebApiUsingApiKey.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Catalog.Api.Repositories;
-using Microsoft.Extensions.Hosting.WindowsServices;
-
-var arg = new WebApplicationOptions
-{
-    Args = args,
-    ContentRootPath = WindowsServiceHelpers.IsWindowsService() ? AppContext.BaseDirectory : default
-};
+using Microsoft.AspNetCore.HttpLogging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseWindowsService();
+builder.Services.AddW3CLogging(logging =>
+{
+    // Log all W3C fields
+    logging.LoggingFields = W3CLoggingFields.All;
+
+    logging.FileSizeLimit = 5 * 1024 * 1024;
+    logging.RetainedFileCountLimit = 2;
+    logging.FileName = "api_log_";
+    logging.LogDirectory = @".\logs\";
+    logging.FlushInterval = TimeSpan.FromSeconds(2);
+});
 
 builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
 builder.Services.AddDbContext<SqlDbRepository>(options => options.UseSqlServer(
@@ -20,6 +24,8 @@ builder.Services.AddDbContext<SqlDbRepository>(options => options.UseSqlServer(
 
 
 var app = builder.Build();
+
+app.UseW3CLogging();
 app.UseMiddleware<ApiKeyMiddleware>();
 app.UseAuthorization();
 
