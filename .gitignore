@@ -5,4 +5,5 @@ Catalog.Api/obj
 Catalog.UnitTests/bin
 publish
 */obj/Debug
+*/obj/Release
 Catalog.Api/obj/staticwebassets.pack.sentinel
