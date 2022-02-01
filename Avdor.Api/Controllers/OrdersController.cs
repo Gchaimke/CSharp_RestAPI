@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Avdor.Api.Dtos;
 using Avdor.Api.Entities;
 using Avdor.Api.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Avdor.Api.Controllers;
 
@@ -9,89 +10,136 @@ namespace Avdor.Api.Controllers;
 [Route("orders")]
 public class OrdersController : ControllerBase
 {
-    private readonly SqlDbRepository db;
+    private readonly SqlDbRepository _db;
     private readonly ILogger<OrdersController> logger;
     public OrdersController(SqlDbRepository db, ILogger<OrdersController> logger)
     {
-        this.db = db;
+        this._db = db;
         this.logger = logger;
     }
 
     [HttpGet]
     public IEnumerable<Order> GetOrders()
     {
-        IEnumerable<Order> orders = db.ORDERS;
-        // logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.Count()} orders");
+        IEnumerable<Order> orders = _db.ORDERS;
+        logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.Count()} orders");
         return orders;
     }
 
     [Route("filter")]
-    public IEnumerable<Order> GetOrders(string? name = "", int? customer = 0)
+    public IEnumerable<Order> GetOrders(string? order = "", int? customer = 0)
     {
-        IQueryable<Order> orders = db.ORDERS;
-        if (!string.IsNullOrWhiteSpace(name))
-            orders = orders.Where(i => i.ORDNAME.Contains(name));
+        IQueryable<Order> orders = _db.ORDERS;
+        if (!string.IsNullOrWhiteSpace(order))
+            orders = orders.Where(i => i.ORDNAME.Contains(order));
         if (customer != 0)
             orders = orders.Where(i => i.CUST == customer);
         logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.Count()} orders");
         return orders;
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<OrderDto>> GetOrderAsync(int id)
+    [Route("last")]
+    public Order GetLast()
     {
-        var order = await db.ORDERS.FindAsync(id);
-        if (order is null)
+        Order order = _db.ORDERS.OrderBy(o => o.ORD).Last();
+        logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {order} orders");
+        return order;
+    }
+
+    [HttpGet("{ordname}")]
+    public async Task<ActionResult<OrderDto>> GetOrderAsync(string ordname)
+    {
+        IQueryable<Order> orders = _db.ORDERS.Where(o => o.ORDNAME.Equals(ordname));
+        if (orders is null)
         {
             return NotFound();
         }
-        logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {order}");
-        return order.AsOrderDto();
+        try
+        {
+            Order order = await orders.FirstAsync();
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {order}");
+            return order.AsOrderDto();
+        }
+        catch (System.InvalidOperationException)
+        {
+            return NotFound();
+        }
     }
 
+    [Route("create")]
     [HttpPost]
-    public async Task<ActionResult<OrderDto>> CreateOrderAsync(CreateOrderDto orderDto)
+    public async Task<ActionResult> CreateOrder(CreateOrderDto orderDto)
     {
+        IQueryable<Order> orders = _db.ORDERS;
+        Order last = orders.OrderBy(o => o.ORD).Last();
+        int newOrd = Int32.Parse(last.ORDNAME.Substring(2));
+        if (newOrd < 20000000)
+        {
+            DateTime date = DateTime.Now;
+            string year = date.Year.ToString().Substring(2);
+            newOrd = Int32.Parse(year + "000000");
+        }
         Order order = new()
         {
-            ORDNAME = orderDto.ORDNAME,
+            ORDNAME = "AS" + (newOrd + 1),
             CUST = orderDto.CUST,
+            QPRICE = orderDto.QPRICE,
         };
-        await db.ORDERS.AddAsync(order);
-        await db.SaveChangesAsync();
-        logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Cerated {order}");
-        return CreatedAtAction(nameof(GetOrderAsync), new { id = order.ORD }, order.AsOrderDto());
-    }
+        try
+        {
+            _db.ORDERS.Add(order);
+            await _db.SaveChangesAsync();
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Cerated {order}");
+            return CreatedAtAction(nameof(GetOrderAsync), new { ordname = order.ORDNAME }, order.AsOrderDto());
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateItemAsync(int id, UpdateOrderDto orderDto)
-    {
-        var order = await db.ORDERS.FindAsync(id);
-        if (order is null)
+        }
+        catch (System.InvalidOperationException)
         {
             return NotFound();
         }
 
-        order.ORDNAME = orderDto.ORDNAME;
-        order.CUST = orderDto.CUST;
-
-        db.ORDERS.Update(order);
-        await db.SaveChangesAsync();
-        logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Updated {order}");
-        return CreatedAtAction(nameof(GetOrderAsync), new { id = order.ORD }, order.AsOrderDto());
     }
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteOrderAsync(int id)
+    [Route("update/{ordname}")]
+    [HttpPut("{ordname}")]
+    public async Task<ActionResult> UpdateItemAsync(string ordname, UpdateOrderDto orderDto)
     {
-        var order = await db.ORDERS.FindAsync(id);
-        if (order is null)
+        IQueryable<Order> orders = _db.ORDERS.Where(o => o.ORDNAME.Equals(ordname));
+        try
+        {
+            Order order = await orders.FirstAsync();
+            order.CUST = orderDto.CUST;
+            order.QPRICE = orderDto.QPRICE;
+
+            _db.ORDERS.Update(order);
+            _db.SaveChanges();
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Updated {order}");
+            return CreatedAtAction(nameof(GetOrderAsync), new { ordname = order.ORDNAME }, order.AsOrderDto());
+        }
+        catch (System.InvalidOperationException)
         {
             return NotFound();
         }
-        db.ORDERS.Remove(order);
-        await db.SaveChangesAsync();
-        logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Deleted {order}");
-        return Ok("Deleted");
     }
+
+    [Route("delete/{ordname}")]
+    [HttpDelete("{ordname}")]
+    public async Task<ActionResult> DeleteOrderAsync(string ordname)
+    {
+        IQueryable<Order> orders = _db.ORDERS.Where(o => o.ORDNAME.Equals(ordname));
+        try
+        {
+            Order order = await orders.FirstAsync();
+            _db.ORDERS.Remove(order);
+            _db.SaveChanges();
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Deleted {order}");
+            return Ok("Deleted");
+        }
+        catch (System.InvalidOperationException)
+        {
+            return NotFound();
+        }
+
+    }
+
 }
