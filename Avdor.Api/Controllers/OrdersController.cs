@@ -22,7 +22,7 @@ public class OrdersController : ControllerBase
     public IEnumerable<Order> GetOrders()
     {
         IEnumerable<Order> orders = _db.ORDERS;
-        logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.Count()} orders");
+        // logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.Count()} orders");
         return orders;
     }
 
@@ -81,10 +81,12 @@ public class OrdersController : ControllerBase
         }
         Order order = new()
         {
-            ORDNAME = "AS" + (newOrd + 1),
-            CUST = orderDto.CUST,
-            QPRICE = orderDto.QPRICE,
+            ORDNAME = "SO" + (newOrd + 1),
+            // CUST = orderDto.CUST,
+            REFERENCE = orderDto.REFERENCE,
+            TOTPRICE = orderDto.TOTPRICE,
         };
+        order.SetPrice(orderDto.TOTPRICE, orderDto.vat);
         try
         {
             _db.ORDERS.Add(order);
@@ -108,8 +110,7 @@ public class OrdersController : ControllerBase
         try
         {
             Order order = await orders.FirstAsync();
-            order.CUST = orderDto.CUST;
-            order.QPRICE = orderDto.QPRICE;
+            order.TOTPRICE = orderDto.TOTPRICE;
 
             _db.ORDERS.Update(order);
             _db.SaveChanges();

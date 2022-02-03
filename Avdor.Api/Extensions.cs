@@ -8,18 +8,12 @@ namespace Avdor.Api
 
         public static OrderDto AsOrderDto(this Order order)
         {
-            return new OrderDto(order.ORD, order.CUST, order.ORDNAME, order.CURDATE, order.QPRICE, order.VAT, order.TOTPRICE, order.CURRENCY, order.DISPRICE, order.PAY)
+            return new OrderDto(order.ORDNAME,order.REFERENCE, order.CURDATE, order.TOTPRICE)
             {
-                ORD = order.ORD,
                 ORDNAME = order.ORDNAME,
-                CUST = order.CUST,
+                REFERENCE = order.REFERENCE,
                 CURDATE = order.CURDATE,
-                QPRICE = order.QPRICE,
-                VAT = order.VAT,
                 TOTPRICE = order.TOTPRICE,
-                CURRENCY = order.CURRENCY,
-                DISPRICE = order.DISPRICE,
-                PAY = order.PAY
             };
         }
     }
