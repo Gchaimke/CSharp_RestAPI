@@ -22,6 +22,16 @@ public class OrdersController : ControllerBase
     public IEnumerable<Order> GetOrders()
     {
         IEnumerable<Order> orders = _db.ORDERS;
+        foreach (var order in orders)
+        {
+            OrderCustomer customer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
+            order.customer = customer;
+            IEnumerable<OrderItem> items = _db.ORDERITEMS.Where(o => o.ORD == order.ORD).ToList();
+            order.items = items;
+            OrderShipment shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
+            order.shipment = shipment;
+
+        }
         // logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.Count()} orders");
         return orders;
     }

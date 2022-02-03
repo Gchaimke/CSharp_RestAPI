@@ -8,7 +8,7 @@ namespace Avdor.Api
 
         public static OrderDto AsOrderDto(this Order order)
         {
-            return new OrderDto(order.ORDNAME,order.REFERENCE, order.CURDATE, order.TOTPRICE)
+            return new OrderDto(order.ORDNAME, order.REFERENCE, order.CURDATE, order.TOTPRICE, order.items)
             {
                 ORDNAME = order.ORDNAME,
                 REFERENCE = order.REFERENCE,
