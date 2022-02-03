@@ -23,7 +23,8 @@ public class Order
     public int ORDSTATUS { get; set; } = -1;
     public long PAY { get; set; } = 0;
     public OrderItems ORDERITEMS { get; set; }
-    public ShipTo SHIPTO { get; set; }
+    public OrderShipment SHIPTO { get; set; }
+    public OrderClient NSCUST { get; set; }
 }
 
 public class OrderItems
@@ -47,7 +48,7 @@ public class OrderItems
     public int KLINE { get; set; } = 1;
 }
 
-public class ShipTo
+public class OrderShipment
 {
     [Key]
     public long IV { get; set; }
@@ -63,3 +64,21 @@ public class ShipTo
 
 }
 
+
+public class OrderClient
+{
+    [Key]
+    public long IV { get; set; }
+    public string TYPE { get; set; } = "O";
+    public string CUSTDES { get; set; } = "";
+    public string ADDRESS { get; set; } = "";
+    public string ADDRESS2 { get; set; } = "";
+    public string ADDRESS3 { get; set; } = "";
+    public string STATE { get; set; } = "";
+    public string STATEA { get; set; } = "";
+    public string ZIP { get; set; } = "";
+    public string PHONENUM { get; set; } = "";
+    public string CELLPHONE { get; set; } = "";
+    public string EMAIL { get; set; } = "";
+
+}
