@@ -19,138 +19,304 @@ public class OrdersController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<Order> GetOrders()
+    public IEnumerable<Order> Orders()
     {
-        IEnumerable<Order> orders = _db.ORDERS;
-        foreach (var order in orders)
+        IEnumerable<Order>? orders = _db.ORDERS;
+        if (orders != null)
         {
-            OrderCustomer customer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
-            order.customer = customer;
-            IEnumerable<OrderItem> items = _db.ORDERITEMS.Where(o => o.ORD == order.ORD).ToList();
-            order.items = items;
-            OrderShipment shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
-            order.shipment = shipment;
-
+            foreach (Order order in orders)
+            {
+                if (_db.NSCUST != null)
+                {
+                    OrderCustomer? customer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
+                    // order.customer = customer ??= new OrderCustomer();
+                }
+                if (_db.ORDERITEMS != null)
+                {
+                    IEnumerable<OrderItem> items = _db.ORDERITEMS.Where(o => o.ORD == order.ORD).ToList();
+                    // order.items = items;
+                }
+                if (_db.SHIPTO != null)
+                {
+                    OrderShipment? shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
+                    // order.shipment = shipment ??= new OrderShipment();
+                }
+            }
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.ToList()} orders");
+            return orders;
         }
-        // logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.Count()} orders");
-        return orders;
+        return new List<Order>();
     }
 
     [Route("filter")]
     public IEnumerable<Order> GetOrders(string? order = "", int? customer = 0)
     {
-        IQueryable<Order> orders = _db.ORDERS;
-        if (!string.IsNullOrWhiteSpace(order))
-            orders = orders.Where(i => i.ORDNAME.Contains(order));
-        if (customer != 0)
-            orders = orders.Where(i => i.CUST == customer);
-        logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.Count()} orders");
-        return orders;
+        if (_db.ORDERS != null)
+        {
+            IQueryable<Order> orders = _db.ORDERS;
+            if (!string.IsNullOrWhiteSpace(order))
+                orders = orders.Where(i => i.ORDNAME.Contains(order));
+            if (customer != 0)
+                orders = orders.Where(i => i.CUST == customer);
+
+            foreach (Order cOrder in orders)
+            {
+                if (_db.NSCUST != null)
+                {
+                    OrderCustomer? cCustomer = _db.NSCUST.Where(o => o.IV == cOrder.ORD).FirstOrDefault();
+                    cOrder.customer = cCustomer ??= new OrderCustomer();
+                }
+                if (_db.ORDERITEMS != null)
+                {
+                    IEnumerable<OrderItem> items = _db.ORDERITEMS.Where(o => o.ORD == cOrder.ORD).ToList();
+                    cOrder.items = items;
+                }
+                if (_db.SHIPTO != null)
+                {
+                    OrderShipment? shipment = _db.SHIPTO.Where(o => o.IV == cOrder.ORD).FirstOrDefault();
+                    cOrder.shipment = shipment ??= new OrderShipment();
+                }
+            }
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.Count()} orders");
+            return (IEnumerable<Order>)orders;
+        }
+        return new List<Order>();
     }
 
     [Route("last")]
     public Order GetLast()
     {
-        Order order = _db.ORDERS.OrderBy(o => o.ORD).Last();
-        logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {order} orders");
-        return order;
+        if (_db.ORDERS != null)
+        {
+            Order order = _db.ORDERS.OrderBy(o => o.ORD).Last();
+            if (_db.NSCUST != null)
+            {
+                OrderCustomer? cCustomer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
+                order.customer = cCustomer ??= new OrderCustomer();
+            }
+            if (_db.ORDERITEMS != null)
+            {
+                IEnumerable<OrderItem> items = _db.ORDERITEMS.Where(o => o.ORD == order.ORD).ToList();
+                order.items = items;
+            }
+            if (_db.SHIPTO != null)
+            {
+                OrderShipment? shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
+                order.shipment = shipment ??= new OrderShipment();
+            }
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {order} orders");
+            return order;
+        }
+        return new Order();
     }
 
     [HttpGet("{ordname}")]
-    public async Task<ActionResult<OrderDto>> GetOrderAsync(string ordname)
+    public async Task<ActionResult<OrderDto>> OrderAsync(string ordname)
     {
-        IQueryable<Order> orders = _db.ORDERS.Where(o => o.ORDNAME.Equals(ordname));
-        if (orders is null)
+        if (_db.ORDERS != null)
         {
-            return NotFound();
+            IQueryable<Order> orders = _db.ORDERS.Where(o => o.ORDNAME.Equals(ordname));
+            if (orders is null)
+            {
+                return NotFound();
+            }
+            try
+            {
+                if (orders != null)
+                {
+                    Order order = (Order)await orders.FirstAsync();
+                    if (_db.NSCUST != null)
+                    {
+                        OrderCustomer? cCustomer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
+                        order.customer = cCustomer ??= new OrderCustomer();
+                    }
+                    if (_db.ORDERITEMS != null)
+                    {
+                        IEnumerable<OrderItem> items = _db.ORDERITEMS.Where(o => o.ORD == order.ORD).ToList();
+                        order.items = items;
+                    }
+                    if (_db.SHIPTO != null)
+                    {
+                        OrderShipment? shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
+                        order.shipment = shipment ??= new OrderShipment();
+                    }
+                    logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {order}");
+                    return order.AsOrderDto();
+                }
+            }
+            catch (System.InvalidOperationException)
+            {
+                return NotFound();
+            }
         }
-        try
-        {
-            Order order = await orders.FirstAsync();
-            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {order}");
-            return order.AsOrderDto();
-        }
-        catch (System.InvalidOperationException)
-        {
-            return NotFound();
-        }
+        return NotFound();
     }
 
     [Route("create")]
     [HttpPost]
     public async Task<ActionResult> CreateOrder(CreateOrderDto orderDto)
     {
-        IQueryable<Order> orders = _db.ORDERS;
-        Order last = orders.OrderBy(o => o.ORD).Last();
-        int newOrd = Int32.Parse(last.ORDNAME.Substring(2));
-        if (newOrd < 20000000)
+        if (_db.ORDERS != null)
         {
-            DateTime date = DateTime.Now;
-            string year = date.Year.ToString().Substring(2);
-            newOrd = Int32.Parse(year + "000000");
+            IQueryable<Order> old_orders = _db.ORDERS;
+            Order last = old_orders.OrderBy(o => o.ORD).Last();
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Last order {last.ORDNAME}");
+            long newOrderID = last.ORD + 1;
+            int newOrderName = Int32.Parse(last.ORDNAME.Substring(2));
+            if (newOrderName < 20000000)
+            {
+                DateTime date = DateTime.Now;
+                string year = date.Year.ToString().Substring(2);
+                newOrderName = Int32.Parse(year + "000000");
+            }
+            Order order = new Order
+            {
+                ORDNAME = "SO" + (newOrderName + 1),
+                REFERENCE = orderDto.REFERENCE,
+                TOTPRICE = orderDto.TOTPRICE,
+            };
+            order.SetPrice(orderDto.TOTPRICE, orderDto.vat);
+            await _db.AddAsync(order);
+            _db.SaveChanges();
+            var customer = new OrderCustomer
+            {
+                IV = newOrderID,
+                CUSTDES = orderDto.customer.CUSTDES,
+                PHONE = orderDto.customer.PHONE,
+                ADDRESS = orderDto.customer.ADDRESS,
+
+            };
+            await this.CreateCustomer(customer.AsCustomerDto());
+
+            var shipment = new OrderShipment
+            {
+                IV = newOrderID,
+                CUSTDES = orderDto.shipment.CUSTDES,
+                CELLPHONE = orderDto.shipment.CELLPHONE,
+                ADDRESS = orderDto.shipment.ADDRESS,
+
+            };
+            await this.CreateShipment(shipment.AsShipmentDto());
+            long items_count = 1;
+            foreach (var item in orderDto.items)
+            {
+                OrderItem new_item = new OrderItem
+                {
+                    ORD = newOrderID,
+                    PART = item.PART,
+                    QUANT = item.QUANT,
+                    PRICE = item.PRICE,
+                    KLINE = items_count,
+                };
+                items_count++;
+                await this.CreateItem(new_item.AsItemDto());
+
+            }
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: New order number {order.ORDNAME} qprice={order.TOTPRICE} qprice={order.QPRICE} vat={order.VAT}");
+            return CreatedAtAction(nameof(OrderAsync), new { ordname = order.ORDNAME }, order);
+
         }
-        Order order = new()
+        return NotFound();
+    }
+
+    [Route("customer")]
+    [HttpPost]
+    public async Task<ActionResult> CreateCustomer(CustomerDto customer)
+    {
+        OrderCustomer new_customer = new OrderCustomer
         {
-            ORDNAME = "SO" + (newOrd + 1),
-            // CUST = orderDto.CUST,
-            REFERENCE = orderDto.REFERENCE,
-            TOTPRICE = orderDto.TOTPRICE,
+            IV = customer.IV,
+            CUSTDES = customer.CUSTDES,
+            PHONE = customer.PHONE,
+            ADDRESS = customer.ADDRESS,
         };
-        order.SetPrice(orderDto.TOTPRICE, orderDto.vat);
-        try
-        {
-            _db.ORDERS.Add(order);
-            await _db.SaveChangesAsync();
-            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Cerated {order}");
-            return CreatedAtAction(nameof(GetOrderAsync), new { ordname = order.ORDNAME }, order.AsOrderDto());
+        await _db.NSCUST.AddAsync(new_customer);
+        _db.SaveChanges();
+        return Ok($"Added {customer.CUSTDES}");
+    }
 
-        }
-        catch (System.InvalidOperationException)
+    [Route("shipment")]
+    [HttpPost]
+    public async Task<ActionResult> CreateShipment(ShipmentDto shipment)
+    {
+        OrderShipment new_shipment = new OrderShipment
         {
-            return NotFound();
-        }
+            IV = shipment.IV,
+            CUSTDES = shipment.CUSTDES,
+            NAME = shipment.NAME,
+            CELLPHONE = shipment.CELLPHONE,
+            ADDRESS = "Tel Aviv"
+        };
+        await _db.SHIPTO.AddAsync(new_shipment);
+        _db.SaveChanges();
+        return Ok($"Added {new_shipment.CUSTDES}");
+    }
 
+    [Route("item")]
+    [HttpPost]
+    public async Task<ActionResult> CreateItem(ItemDto item)
+    {
+        OrderItem new_item = new OrderItem
+        {
+            ORD = item.ORD,
+            PART = item.PART,
+            QUANT = item.QUANT,
+            PRICE = item.PRICE,
+            KLINE = item.KLINE
+        };
+        new_item.SetPrice(item.vat);
+        await _db.ORDERITEMS.AddAsync(new_item);
+        _db.SaveChanges();
+
+        return Ok($"Added {new_item.PART}");
     }
 
     [Route("update/{ordname}")]
     [HttpPut("{ordname}")]
-    public async Task<ActionResult> UpdateItemAsync(string ordname, UpdateOrderDto orderDto)
+    public async Task<ActionResult> UpdateItemAsync(string ordname, OrderDto orderDto)
     {
-        IQueryable<Order> orders = _db.ORDERS.Where(o => o.ORDNAME.Equals(ordname));
-        try
+        if (_db.ORDERS != null)
         {
-            Order order = await orders.FirstAsync();
-            order.TOTPRICE = orderDto.TOTPRICE;
+            IQueryable<Order> orders = _db.ORDERS.Where(o => o.ORDNAME.Equals(ordname));
+            try
+            {
+                Order order = await orders.FirstAsync();
+                order.TOTPRICE = orderDto.TOTPRICE;
 
-            _db.ORDERS.Update(order);
-            _db.SaveChanges();
-            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Updated {order}");
-            return CreatedAtAction(nameof(GetOrderAsync), new { ordname = order.ORDNAME }, order.AsOrderDto());
+                _db.ORDERS.Update(order);
+                _db.SaveChanges();
+                logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Updated {order}");
+                return CreatedAtAction(nameof(OrderAsync), new { ordname = order.ORDNAME }, order);
+            }
+            catch (System.InvalidOperationException)
+            {
+                return NotFound();
+            }
         }
-        catch (System.InvalidOperationException)
-        {
-            return NotFound();
-        }
+        return NotFound();
     }
 
     [Route("delete/{ordname}")]
     [HttpDelete("{ordname}")]
     public async Task<ActionResult> DeleteOrderAsync(string ordname)
     {
-        IQueryable<Order> orders = _db.ORDERS.Where(o => o.ORDNAME.Equals(ordname));
-        try
+        if (_db.ORDERS != null)
         {
-            Order order = await orders.FirstAsync();
-            _db.ORDERS.Remove(order);
-            _db.SaveChanges();
-            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Deleted {order}");
-            return Ok("Deleted");
+            IQueryable<Order> orders = _db.ORDERS.Where(o => o.ORDNAME.Equals(ordname));
+            try
+            {
+                Order order = await orders.FirstAsync();
+                _db.ORDERS.Remove(order);
+                _db.SaveChanges();
+                logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Deleted {order}");
+                return Ok("Deleted");
+            }
+            catch (System.InvalidOperationException)
+            {
+                return NotFound();
+            }
         }
-        catch (System.InvalidOperationException)
-        {
-            return NotFound();
-        }
-
+        return NotFound();
     }
 
 }
