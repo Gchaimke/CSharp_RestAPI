@@ -12,10 +12,12 @@ public class OrdersController : ControllerBase
 {
     private readonly SqlDbRepository _db;
     private readonly ILogger<OrdersController> logger;
-    public OrdersController(SqlDbRepository db, ILogger<OrdersController> logger)
+    private readonly IConfiguration configuration;
+    public OrdersController(SqlDbRepository db, ILogger<OrdersController> logger, IConfiguration configuration)
     {
         this._db = db;
         this.logger = logger;
+        this.configuration = configuration;
     }
 
     [HttpGet]
@@ -156,6 +158,11 @@ public class OrdersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateOrder(CreateOrderDto orderDto)
     {
+
+        long DefoultClient = configuration.GetValue<long>("DefaultClient");
+        if (DefoultClient == 0)
+            DefoultClient = 1539;
+
         if (_db.ORDERS != null)
         {
             IQueryable<Order> old_orders = _db.ORDERS;
@@ -174,9 +181,11 @@ public class OrdersController : ControllerBase
                 ORDNAME = "SO" + (newOrderName + 1),
                 REFERENCE = orderDto.REFERENCE,
                 TOTPRICE = orderDto.TOTPRICE,
+                CUST = DefoultClient,
             };
             order.SetPrice(orderDto.TOTPRICE, orderDto.vat);
             await _db.AddAsync(order);
+
             _db.SaveChanges();
             var customer = new OrderCustomer
             {
@@ -230,7 +239,7 @@ public class OrdersController : ControllerBase
             PHONE = customer.PHONE,
             ADDRESS = customer.ADDRESS,
         };
-        await _db.NSCUST.AddAsync(new_customer);
+        await _db.AddAsync(new_customer);
         _db.SaveChanges();
         return Ok($"Added {customer.CUSTDES}");
     }
@@ -247,7 +256,7 @@ public class OrdersController : ControllerBase
             CELLPHONE = shipment.CELLPHONE,
             ADDRESS = "Tel Aviv"
         };
-        await _db.SHIPTO.AddAsync(new_shipment);
+        await _db.AddAsync(new_shipment);
         _db.SaveChanges();
         return Ok($"Added {new_shipment.CUSTDES}");
     }
@@ -265,11 +274,27 @@ public class OrdersController : ControllerBase
             KLINE = item.KLINE
         };
         new_item.SetPrice(item.vat);
-        await _db.ORDERITEMS.AddAsync(new_item);
+        await _db.AddAsync(new_item);
         _db.SaveChanges();
-
+        await this.CreateItemA(new_item);
         return Ok($"Added {new_item.PART}");
     }
+
+    [Route("itema")]
+    [HttpPost]
+    public async Task<ActionResult> CreateItemA(OrderItem item)
+    {
+        OrderItemA orderItema = new OrderItemA
+        {
+            ORDI = item.ORDI
+        };
+        await _db.AddAsync(orderItema);
+        _db.SaveChanges();
+
+        return Ok($"Added itemA {item.PART}");
+    }
+
+
 
     [Route("update/{ordname}")]
     [HttpPut("{ordname}")]
