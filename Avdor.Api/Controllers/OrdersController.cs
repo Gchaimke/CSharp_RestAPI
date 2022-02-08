@@ -253,7 +253,7 @@ public class OrdersController : ControllerBase
             PHONE = customer.PHONE,
             ADDRESS = customer.ADDRESS,
         };
-        new_customer =  this.ReverseEnglishString(new_customer);
+        new_customer = this.ReverseEnglishString(new_customer);
 
         await _db.AddAsync(new_customer);
         _db.SaveChanges();
@@ -272,7 +272,7 @@ public class OrdersController : ControllerBase
             CELLPHONE = shipment.CELLPHONE,
             ADDRESS = "Tel Aviv"
         };
-        new_shipment =  this.ReverseEnglishString(new_shipment);
+        new_shipment = this.ReverseEnglishString(new_shipment);
         await _db.AddAsync(new_shipment);
         _db.SaveChanges();
         return Ok($"Added {new_shipment.CUSTDES}");
@@ -384,11 +384,17 @@ public class OrdersController : ControllerBase
             if (type != null && type == typeof(string))
             {
                 string c_prop = prop.GetValue(obj, null).ToString();
-                if (c_prop != null && c_prop != "" && Regex.IsMatch(c_prop, @"^[a-zA-Z0-9\s]*$"))
+                if (c_prop != null && c_prop != "")
                 {
-                    char[] charArray = c_prop.ToCharArray();
-                    Array.Reverse(charArray);
-                    prop.SetValue(obj, new string(charArray));
+                    if(Regex.IsMatch(c_prop, @"^[0-9\s-]*$")){
+                        continue;
+                    }
+                    if (Regex.IsMatch(c_prop, @"^[a-zA-Z0-9\s]*$"))
+                    {
+                        char[] charArray = c_prop.ToCharArray();
+                        Array.Reverse(charArray);
+                        prop.SetValue(obj, new string(charArray));
+                    }
                 }
             }
         }
