@@ -395,7 +395,7 @@ public class OrdersController : ControllerBase
                 string c_prop = prop.GetValue(obj, null).ToString();
                 if (c_prop != null && c_prop != "")
                 {
-                    if (Regex.IsMatch(c_prop, @"^[0-9\s-]*$"))
+                    if (Regex.IsMatch(c_prop, @"^[0-9\s-]*$") || Regex.IsMatch(c_prop, @".+@.+\..*"))
                     {
                         continue;
                     }
