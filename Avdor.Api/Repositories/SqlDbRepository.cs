@@ -11,14 +11,14 @@ public class SqlDbRepository : DbContext
     public DbSet<OrderA>? ORDERSA { get; set; }
     public DbSet<OrderItem>? ORDERITEMS { get; set; }
     public DbSet<OrderItemA>? ORDERITEMSA { get; set; }
-    public DbSet<OrderCustomer>? NSCUST { get; set; }
-    public DbSet<OrderShipment>? SHIPTO { get; set; }
+    public DbSet<Customer>? NSCUST { get; set; }
+    public DbSet<Shipment>? SHIPTO { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Order>().ToTable(nameof(ORDERS))
             .HasMany(c => c.items);
         modelBuilder.Entity<OrderItem>().ToTable(nameof(ORDERITEMS));
-        modelBuilder.Entity<OrderShipment>().ToTable(nameof(SHIPTO));
+        modelBuilder.Entity<Shipment>().ToTable(nameof(SHIPTO));
     }
 }

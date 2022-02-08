@@ -32,8 +32,8 @@ public class OrdersController : ControllerBase
             {
                 if (_db.NSCUST != null)
                 {
-                    OrderCustomer? customer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
-                    // order.customer = customer ??= new OrderCustomer();
+                    Customer? customer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
+                    // order.customer = customer ??= new Customer();
                 }
                 if (_db.ORDERITEMS != null)
                 {
@@ -42,8 +42,8 @@ public class OrdersController : ControllerBase
                 }
                 if (_db.SHIPTO != null)
                 {
-                    OrderShipment? shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
-                    // order.shipment = shipment ??= new OrderShipment();
+                    Shipment? shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
+                    // order.shipment = shipment ??= new Shipment();
                 }
             }
             logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.ToList()} orders");
@@ -67,8 +67,8 @@ public class OrdersController : ControllerBase
             {
                 if (_db.NSCUST != null)
                 {
-                    OrderCustomer? cCustomer = _db.NSCUST.Where(o => o.IV == cOrder.ORD).FirstOrDefault();
-                    cOrder.customer = cCustomer ??= new OrderCustomer();
+                    Customer? cCustomer = _db.NSCUST.Where(o => o.IV == cOrder.ORD).FirstOrDefault();
+                    cOrder.customer = cCustomer ??= new Customer();
                 }
                 if (_db.ORDERITEMS != null)
                 {
@@ -77,8 +77,8 @@ public class OrdersController : ControllerBase
                 }
                 if (_db.SHIPTO != null)
                 {
-                    OrderShipment? shipment = _db.SHIPTO.Where(o => o.IV == cOrder.ORD).FirstOrDefault();
-                    cOrder.shipment = shipment ??= new OrderShipment();
+                    Shipment? shipment = _db.SHIPTO.Where(o => o.IV == cOrder.ORD).FirstOrDefault();
+                    cOrder.shipment = shipment ??= new Shipment();
                 }
             }
             logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {orders.Count()} orders");
@@ -95,8 +95,8 @@ public class OrdersController : ControllerBase
             Order order = _db.ORDERS.OrderBy(o => o.ORD).Last();
             if (_db.NSCUST != null)
             {
-                OrderCustomer? cCustomer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
-                order.customer = cCustomer ??= new OrderCustomer();
+                Customer? cCustomer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
+                order.customer = cCustomer ??= new Customer();
             }
             if (_db.ORDERITEMS != null)
             {
@@ -105,8 +105,8 @@ public class OrdersController : ControllerBase
             }
             if (_db.SHIPTO != null)
             {
-                OrderShipment? shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
-                order.shipment = shipment ??= new OrderShipment();
+                Shipment? shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
+                order.shipment = shipment ??= new Shipment();
             }
             logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {order} orders");
             return order;
@@ -131,8 +131,8 @@ public class OrdersController : ControllerBase
                     Order order = (Order)await orders.FirstAsync();
                     if (_db.NSCUST != null)
                     {
-                        OrderCustomer? cCustomer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
-                        order.customer = cCustomer ??= new OrderCustomer();
+                        Customer? cCustomer = _db.NSCUST.Where(o => o.IV == order.ORD).FirstOrDefault();
+                        order.customer = cCustomer ??= new Customer();
                     }
                     if (_db.ORDERITEMS != null)
                     {
@@ -141,8 +141,8 @@ public class OrdersController : ControllerBase
                     }
                     if (_db.SHIPTO != null)
                     {
-                        OrderShipment? shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
-                        order.shipment = shipment ??= new OrderShipment();
+                        Shipment? shipment = _db.SHIPTO.Where(o => o.IV == order.ORD).FirstOrDefault();
+                        order.shipment = shipment ??= new Shipment();
                     }
                     logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrived {order}");
                     return order.AsOrderDto();
@@ -195,24 +195,29 @@ public class OrdersController : ControllerBase
             await _db.AddAsync(order);
             _db.SaveChanges();
 
-            var customer = new OrderCustomer
+            var customer = new Customer
             {
                 IV = newOrderID,
                 CUSTDES = orderDto.customer.CUSTDES,
                 PHONE = orderDto.customer.PHONE,
                 ADDRESS = orderDto.customer.ADDRESS,
+                STATE = orderDto.customer.STATE,
+                EMAIL = orderDto.customer.EMAIL,
+
 
             };
 
             await this.CreateCustomer(customer.AsCustomerDto());
 
-            var shipment = new OrderShipment
+            var shipment = new Shipment
             {
                 IV = newOrderID,
                 CUSTDES = orderDto.shipment.CUSTDES,
                 CELLPHONE = orderDto.shipment.CELLPHONE,
                 ADDRESS = orderDto.shipment.ADDRESS,
-
+                EMAIL = orderDto.shipment.EMAIL,
+                NAME = orderDto.shipment.NAME,
+                STATE = orderDto.shipment.STATE
             };
             await this.CreateShipment(shipment.AsShipmentDto());
             long quant = 0;
@@ -246,12 +251,14 @@ public class OrdersController : ControllerBase
     [NonAction]
     public async Task<ActionResult> CreateCustomer(CustomerDto customer)
     {
-        OrderCustomer new_customer = new OrderCustomer
+        Customer new_customer = new Customer
         {
             IV = customer.IV,
             CUSTDES = customer.CUSTDES,
             PHONE = customer.PHONE,
             ADDRESS = customer.ADDRESS,
+            STATE = customer.STATE,
+            EMAIL = customer.EMAIL
         };
         new_customer = this.ReverseEnglishString(new_customer);
 
@@ -264,13 +271,15 @@ public class OrdersController : ControllerBase
     public async Task<ActionResult> CreateShipment(ShipmentDto shipment)
     {
 
-        OrderShipment new_shipment = new OrderShipment
+        Shipment new_shipment = new Shipment
         {
             IV = shipment.IV,
             CUSTDES = shipment.CUSTDES,
             NAME = shipment.NAME,
             CELLPHONE = shipment.CELLPHONE,
-            ADDRESS = "Tel Aviv"
+            ADDRESS = shipment.ADDRESS,
+            STATE = shipment.STATE,
+            EMAIL = shipment.EMAIL
         };
         new_shipment = this.ReverseEnglishString(new_shipment);
         await _db.AddAsync(new_shipment);
@@ -386,10 +395,11 @@ public class OrdersController : ControllerBase
                 string c_prop = prop.GetValue(obj, null).ToString();
                 if (c_prop != null && c_prop != "")
                 {
-                    if(Regex.IsMatch(c_prop, @"^[0-9\s-]*$")){
+                    if (Regex.IsMatch(c_prop, @"^[0-9\s-]*$"))
+                    {
                         continue;
                     }
-                    if (Regex.IsMatch(c_prop, @"^[a-zA-Z0-9\s]*$"))
+                    if (Regex.IsMatch(c_prop, @"^[a-zA-Z0-9\W|_]*$"))
                     {
                         char[] charArray = c_prop.ToCharArray();
                         Array.Reverse(charArray);

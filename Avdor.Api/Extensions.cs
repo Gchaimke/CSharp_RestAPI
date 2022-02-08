@@ -21,33 +21,37 @@ namespace Avdor.Api
             };
         }
 
-        public static CustomerDto AsCustomerDto(this OrderCustomer customer)
+        public static CustomerDto AsCustomerDto(this Customer customer)
         {
-            return new CustomerDto(customer.IV, customer.CUSTDES, customer.PHONE, customer.ADDRESS)
+            return new CustomerDto(customer.IV, customer.CUSTDES, customer.PHONE, customer.ADDRESS, customer.STATE, customer.EMAIL)
             {
 
                 IV = customer.IV,
                 CUSTDES = customer.CUSTDES,
                 PHONE = customer.PHONE,
                 ADDRESS = customer.ADDRESS,
+                STATE = customer.STATE,
+                EMAIL = customer.EMAIL,
             };
         }
 
-        public static ShipmentDto AsShipmentDto(this OrderShipment shipment)
+        public static ShipmentDto AsShipmentDto(this Shipment shipment)
         {
-            return new ShipmentDto(shipment.IV, shipment.CUSTDES, shipment.NAME, shipment.ADDRESS, shipment.CELLPHONE)
+            return new ShipmentDto(shipment.IV, shipment.CUSTDES, shipment.NAME, shipment.ADDRESS, shipment.STATE, shipment.CELLPHONE, shipment.EMAIL)
             {
                 IV = shipment.IV,
                 CUSTDES = shipment.CUSTDES,
                 NAME = shipment.NAME,
                 CELLPHONE = shipment.CELLPHONE,
                 ADDRESS = shipment.ADDRESS,
+                STATE = shipment.STATE,
+                EMAIL = shipment.EMAIL,
             };
         }
 
         public static ItemDto AsItemDto(this OrderItem item)
         {
-            return new ItemDto(item.ORD, item.PART, item.QUANT, item.PRICE,item.KLINE, item.vat)
+            return new ItemDto(item.ORD, item.PART, item.QUANT, item.PRICE, item.KLINE, item.vat)
             {
                 ORD = item.ORD,
                 PART = item.PART,

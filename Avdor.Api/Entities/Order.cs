@@ -40,11 +40,11 @@ public class Order
 
     [ForeignKey("ORD")]
     [DisplayFormat(NullDisplayText = "No castomer")]
-    public OrderCustomer customer { get; set; }
+    public Customer customer { get; set; }
 
     [ForeignKey("ORD")]
     [DisplayFormat(NullDisplayText = "No shipment")]
-    public OrderShipment shipment { get; set; }
+    public Shipment shipment { get; set; }
 
     [NotMapped]
     public long TOTQUANT{ get; set; }=1;
