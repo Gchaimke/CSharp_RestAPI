@@ -22,6 +22,7 @@ public class Order
     public long CURRENCY { get; set; } = -1;
     public long AGENT { get; set; } = 2;
     public string ADJPRICEFLAG { get; set; } = "3";
+    public double ADVPERCENT { get; set; } = 100;
     public long DOER { get; set; } = 1;
     public long ORDSTATUS { get; set; } = -1;
     public long PAY { get; set; } = 24;
@@ -44,6 +45,9 @@ public class Order
     [ForeignKey("ORD")]
     [DisplayFormat(NullDisplayText = "No shipment")]
     public OrderShipment shipment { get; set; }
+
+    [NotMapped]
+    public long TOTQUANT{ get; set; }=1;
 }
 
 

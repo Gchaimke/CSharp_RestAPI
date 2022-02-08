@@ -3,6 +3,8 @@ using Avdor.Api.Dtos;
 using Avdor.Api.Entities;
 using Avdor.Api.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Avdor.Api.Controllers;
 
@@ -159,9 +161,12 @@ public class OrdersController : ControllerBase
     public async Task<ActionResult> CreateOrder(CreateOrderDto orderDto)
     {
 
-        long DefoultClient = configuration.GetValue<long>("DefaultClient");
-        if (DefoultClient == 0)
-            DefoultClient = 1539;
+        long client = configuration.GetValue<long>("DefaultClient");
+        long agent = configuration.GetValue<long>("DefaultAgent");
+        if (client == 0)
+            client = 1539;
+        if (agent == 0)
+            agent = 2;
 
         if (_db.ORDERS != null)
         {
@@ -181,13 +186,15 @@ public class OrdersController : ControllerBase
                 ORDNAME = "SO" + (newOrderName + 1),
                 REFERENCE = orderDto.REFERENCE,
                 TOTPRICE = orderDto.TOTPRICE,
-                CUST = DefoultClient,
+                CUST = client,
+                AGENT = agent
             };
+
+
             order.SetPrice(orderDto.TOTPRICE, orderDto.vat);
             await _db.AddAsync(order);
             _db.SaveChanges();
 
-            await CreateOrderA(order);
             var customer = new OrderCustomer
             {
                 IV = newOrderID,
@@ -196,6 +203,7 @@ public class OrdersController : ControllerBase
                 ADDRESS = orderDto.customer.ADDRESS,
 
             };
+
             await this.CreateCustomer(customer.AsCustomerDto());
 
             var shipment = new OrderShipment
@@ -207,6 +215,7 @@ public class OrdersController : ControllerBase
 
             };
             await this.CreateShipment(shipment.AsShipmentDto());
+            long quant = 0;
             long items_count = 1;
             foreach (var item in orderDto.items)
             {
@@ -218,10 +227,15 @@ public class OrdersController : ControllerBase
                     PRICE = item.PRICE,
                     KLINE = items_count,
                 };
+                quant += new_item.QUANT;
                 items_count++;
                 await this.CreateItem(new_item.AsItemDto());
 
             }
+
+            order.TOTQUANT = quant;
+            await CreateOrderA(order);
+
             logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: New order number {order.ORDNAME} qprice={order.TOTPRICE} qprice={order.QPRICE} vat={order.VAT}");
             return CreatedAtAction(nameof(OrderAsync), new { ordname = order.ORDNAME }, order);
 
@@ -239,6 +253,8 @@ public class OrdersController : ControllerBase
             PHONE = customer.PHONE,
             ADDRESS = customer.ADDRESS,
         };
+        new_customer =  this.ReverseEnglishString(new_customer);
+
         await _db.AddAsync(new_customer);
         _db.SaveChanges();
         return Ok($"Added {customer.CUSTDES}");
@@ -247,6 +263,7 @@ public class OrdersController : ControllerBase
     [NonAction]
     public async Task<ActionResult> CreateShipment(ShipmentDto shipment)
     {
+
         OrderShipment new_shipment = new OrderShipment
         {
             IV = shipment.IV,
@@ -255,6 +272,7 @@ public class OrdersController : ControllerBase
             CELLPHONE = shipment.CELLPHONE,
             ADDRESS = "Tel Aviv"
         };
+        new_shipment =  this.ReverseEnglishString(new_shipment);
         await _db.AddAsync(new_shipment);
         _db.SaveChanges();
         return Ok($"Added {new_shipment.CUSTDES}");
@@ -297,7 +315,9 @@ public class OrdersController : ControllerBase
     {
         OrderA orderA = new OrderA
         {
-            ORD = order.ORD
+            ORD = order.ORD,
+            TOTPURCHASEPRICE = order.TOTPRICE,
+            TOTQUANT = order.TOTQUANT
         };
         await _db.AddAsync(orderA);
         _db.SaveChanges();
@@ -352,6 +372,28 @@ public class OrdersController : ControllerBase
             }
         }
         return NotFound();
+    }
+
+    [NonAction]
+    public T ReverseEnglishString<T>(T obj)
+    {
+
+        foreach (PropertyInfo prop in obj.GetType().GetProperties())
+        {
+            var type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+            if (type != null && type == typeof(string))
+            {
+                string c_prop = prop.GetValue(obj, null).ToString();
+                if (c_prop != null && c_prop != "" && Regex.IsMatch(c_prop, @"^[a-zA-Z0-9\s]*$"))
+                {
+                    char[] charArray = c_prop.ToCharArray();
+                    Array.Reverse(charArray);
+                    prop.SetValue(obj, new string(charArray));
+                }
+            }
+        }
+
+        return obj;
     }
 
 }
