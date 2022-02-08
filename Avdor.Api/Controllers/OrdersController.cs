@@ -185,8 +185,9 @@ public class OrdersController : ControllerBase
             };
             order.SetPrice(orderDto.TOTPRICE, orderDto.vat);
             await _db.AddAsync(order);
-
             _db.SaveChanges();
+
+            await CreateOrderA(order);
             var customer = new OrderCustomer
             {
                 IV = newOrderID,
@@ -228,8 +229,7 @@ public class OrdersController : ControllerBase
         return NotFound();
     }
 
-    [Route("customer")]
-    [HttpPost]
+    [NonAction]
     public async Task<ActionResult> CreateCustomer(CustomerDto customer)
     {
         OrderCustomer new_customer = new OrderCustomer
@@ -244,8 +244,7 @@ public class OrdersController : ControllerBase
         return Ok($"Added {customer.CUSTDES}");
     }
 
-    [Route("shipment")]
-    [HttpPost]
+    [NonAction]
     public async Task<ActionResult> CreateShipment(ShipmentDto shipment)
     {
         OrderShipment new_shipment = new OrderShipment
@@ -261,8 +260,7 @@ public class OrdersController : ControllerBase
         return Ok($"Added {new_shipment.CUSTDES}");
     }
 
-    [Route("item")]
-    [HttpPost]
+    [NonAction]
     public async Task<ActionResult> CreateItem(ItemDto item)
     {
         OrderItem new_item = new OrderItem
@@ -280,8 +278,7 @@ public class OrdersController : ControllerBase
         return Ok($"Added {new_item.PART}");
     }
 
-    [Route("itema")]
-    [HttpPost]
+    [NonAction]
     public async Task<ActionResult> CreateItemA(OrderItem item)
     {
         OrderItemA orderItema = new OrderItemA
@@ -294,6 +291,19 @@ public class OrdersController : ControllerBase
         return Ok($"Added itemA {item.PART}");
     }
 
+
+    [NonAction]
+    public async Task<ActionResult> CreateOrderA(Order order)
+    {
+        OrderA orderA = new OrderA
+        {
+            ORD = order.ORD
+        };
+        await _db.AddAsync(orderA);
+        _db.SaveChanges();
+
+        return Ok($"Added new OrdersA record {order.ORD}");
+    }
 
 
     [Route("update/{ordname}")]
